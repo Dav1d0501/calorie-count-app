@@ -1,5 +1,4 @@
 package com.example.caloriecountingapp.viewmodel;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
