@@ -16,7 +16,7 @@ import com.example.caloriecountingapp.data.FirestoreRepository;
 import com.example.caloriecountingapp.databinding.FragmentGoalBinding;
 import com.example.caloriecountingapp.viewmodel.UserViewModel;
 
-// Collects body data and computes the daily calorie target
+// Collects body data + target weight, computes the daily calorie target
 public class GoalFragment extends Fragment {
 
     private FragmentGoalBinding binding;
@@ -30,9 +30,12 @@ public class GoalFragment extends Fragment {
     // TDEE multipliers, same order as activityLevels
     private final double[] activityFactors = { 1.2, 1.375, 1.55, 1.725 };
 
-    private final String[] goals = { "Lose weight", "Maintain", "Build muscle" };
-    // kcal/day adjustment, same order as goals
-    private final int[] goalAdjustments = { -500, 0, 300 };
+    private final String[] rates = { "Slow", "Medium", "Fast" };
+    // kg per week toward the target weight, same order as rates
+    private final double[] rateKgPerWeek = { 0.25, 0.5, 0.75 };
+
+    // 1 kg body weight is about 7700 kcal
+    private static final double KCAL_PER_KG = 7700.0;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -48,8 +51,8 @@ public class GoalFragment extends Fragment {
 
         binding.activitySpinner.setAdapter(new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_dropdown_item, activityLevels));
-        binding.goalSpinner.setAdapter(new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_spinner_dropdown_item, goals));
+        binding.rateSpinner.setAdapter(new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_spinner_dropdown_item, rates));
 
         binding.calculateButton.setOnClickListener(v -> calculate());
 
@@ -61,8 +64,10 @@ public class GoalFragment extends Fragment {
         String ageStr = binding.ageInput.getText().toString();
         String heightStr = binding.heightInput.getText().toString();
         String weightStr = binding.weightInput.getText().toString();
+        String targetWeightStr = binding.targetWeightInput.getText().toString();
 
-        if (ageStr.isEmpty() || heightStr.isEmpty() || weightStr.isEmpty()) {
+        if (ageStr.isEmpty() || heightStr.isEmpty() || weightStr.isEmpty()
+                || targetWeightStr.isEmpty()) {
             Toast.makeText(getContext(), getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show();
             return;
         }
@@ -70,15 +75,25 @@ public class GoalFragment extends Fragment {
         int age = Integer.parseInt(ageStr);
         int height = Integer.parseInt(heightStr);
         double weight = Double.parseDouble(weightStr);
+        double targetWeight = Double.parseDouble(targetWeightStr);
         boolean isMale = binding.sexMale.isChecked();
 
-        // Mifflin-St Jeor BMR
+        // Mifflin-St Jeor BMR, then maintenance calories
         double bmr = (10 * weight) + (6.25 * height) - (5 * age) + (isMale ? 5 : -161);
+        double maintenance = bmr * activityFactors[binding.activitySpinner.getSelectedItemPosition()];
 
-        double factor = activityFactors[binding.activitySpinner.getSelectedItemPosition()];
-        int adjustment = goalAdjustments[binding.goalSpinner.getSelectedItemPosition()];
+        // Daily calorie change from the chosen weekly rate
+        double kgPerWeek = rateKgPerWeek[binding.rateSpinner.getSelectedItemPosition()];
+        double dailyChange = (kgPerWeek * KCAL_PER_KG) / 7.0;
 
-        dailyTarget = (int) Math.round(bmr * factor) + adjustment;
+        // Direction: below current weight = deficit, above = surplus, equal = maintain
+        if (targetWeight < weight) {
+            dailyTarget = (int) Math.round(maintenance - dailyChange);
+        } else if (targetWeight > weight) {
+            dailyTarget = (int) Math.round(maintenance + dailyChange);
+        } else {
+            dailyTarget = (int) Math.round(maintenance);
+        }
 
         binding.resultText.setText(getString(R.string.daily_target, dailyTarget));
         viewModel.setDailyTarget(dailyTarget);

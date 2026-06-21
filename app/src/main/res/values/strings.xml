@@ -51,4 +51,7 @@
     <string name="week_label">Last 7 days: %1$d kcal total  |  avg %2$d kcal/day</string>
     <string name="update_goal">Update goal</string>
     <string name="logout">Logout</string>
+
+    <string name="target_weight_hint">Target weight (kg)</string>
+    <string name="rate">Rate</string>
 </resources>
