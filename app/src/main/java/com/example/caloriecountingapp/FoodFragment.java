@@ -13,25 +13,26 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.caloriecountingapp.data.Food;
+import com.example.caloriecountingapp.data.FirestoreRepository;
 import com.example.caloriecountingapp.databinding.FragmentFoodBinding;
 import com.example.caloriecountingapp.viewmodel.UserViewModel;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
-// Food screen: loads the foods catalog, computes calories for an amount, logs it.
+// Loads the ingredient catalog, computes calories + macros for an amount, logs it
 public class FoodFragment extends Fragment {
 
     private FragmentFoodBinding binding;
     private UserViewModel viewModel;
-    private final com.example.caloriecountingapp.data.FirestoreRepository repository =
-            new com.example.caloriecountingapp.data.FirestoreRepository();
+    private final FirestoreRepository repository = new FirestoreRepository();
     private List<Food> foods;
-    private int lastCalculatedCalories = 0;
+
+    // Last calculated values, committed when the user taps Add
+    private int lastCal = 0, lastProtein = 0, lastCarbs = 0, lastFat = 0;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -45,42 +46,41 @@ public class FoodFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
-
         foods = loadFoods();
 
-        // Searchable dropdown: filters the 253 ingredients as the user types
         ArrayAdapter<Food> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_dropdown_item_1line, foods);
         binding.foodSpinner.setAdapter(adapter);
 
+        binding.backButton.setOnClickListener(v ->
+                Navigation.findNavController(view).navigateUp());
+
         binding.calculateButton.setOnClickListener(v -> calculate());
 
         binding.addButton.setOnClickListener(v -> {
-            viewModel.addCalories(lastCalculatedCalories);
-            repository.saveTodayEaten(viewModel.getTotalEaten());  // persist today's total
+            viewModel.addFood(lastCal, lastProtein, lastCarbs, lastFat);
+            repository.saveToday(
+                    viewModel.getEaten().getValue(),
+                    viewModel.getProtein().getValue(),
+                    viewModel.getCarbs().getValue(),
+                    viewModel.getFat().getValue());
             Toast.makeText(getContext(), "Added", Toast.LENGTH_SHORT).show();
-            // Go back to Summary, which updates automatically
             Navigation.findNavController(view).navigateUp();
         });
     }
 
-    // Reads res/raw/foods.json into a list of Food objects
     private List<Food> loadFoods() {
-        InputStream is = getResources().openRawResource(R.raw.foods);
-        byte[] buffer;
         try {
-            buffer = new byte[is.available()];
+            InputStream is = getResources().openRawResource(R.raw.foods);
+            byte[] buffer = new byte[is.available()];
             is.read(buffer);
             is.close();
+            String json = new String(buffer, StandardCharsets.UTF_8);
+            FoodWrapper wrapper = new Gson().fromJson(json, FoodWrapper.class);
+            return wrapper.foods;
         } catch (Exception e) {
-            return new java.util.ArrayList<>();
+            return new ArrayList<>();
         }
-        String json = new String(buffer, StandardCharsets.UTF_8);
-
-        // foods.json is { "foods": [ ... ] }, so parse the wrapper then take the list
-        Gson gson = new Gson();
-        FoodWrapper wrapper = gson.fromJson(json, FoodWrapper.class);
-        return wrapper.foods;
     }
 
     private void calculate() {
@@ -96,7 +96,7 @@ public class FoodFragment extends Fragment {
             return;
         }
 
-        // Find the matching food by name (case-insensitive)
+        // Match the typed text to a food in the catalog
         Food selected = null;
         for (Food f : foods) {
             if (f.name.equalsIgnoreCase(typedName)) {
@@ -110,14 +110,18 @@ public class FoodFragment extends Fragment {
         }
 
         double grams = Double.parseDouble(gramsStr);
-        lastCalculatedCalories = selected.caloriesForGrams(grams);
+        lastCal = selected.caloriesForGrams(grams);
+        lastProtein = selected.proteinForGrams(grams);
+        lastCarbs = selected.carbsForGrams(grams);
+        lastFat = selected.fatForGrams(grams);
 
         binding.caloriesText.setText(
-                selected.name + " (" + (int) grams + "g) = " + lastCalculatedCalories + " kcal");
+                selected.name + " (" + (int) grams + "g) = " + lastCal + " kcal\n" +
+                        "P: " + lastProtein + "g  C: " + lastCarbs + "g  F: " + lastFat + "g");
         binding.addButton.setVisibility(View.VISIBLE);
     }
 
-    // Matches the top-level shape of foods.json
+    // Top-level shape of foods.json
     private static class FoodWrapper {
         List<Food> foods;
     }

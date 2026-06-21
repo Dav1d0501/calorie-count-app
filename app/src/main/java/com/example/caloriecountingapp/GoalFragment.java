@@ -1,33 +1,38 @@
 package com.example.caloriecountingapp;
-import androidx.lifecycle.ViewModelProvider;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
-import com.example.caloriecountingapp.viewmodel.UserViewModel;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+
 import com.example.caloriecountingapp.data.FirestoreRepository;
 import com.example.caloriecountingapp.databinding.FragmentGoalBinding;
+import com.example.caloriecountingapp.viewmodel.UserViewModel;
 
+// Collects body data and computes the daily calorie target
 public class GoalFragment extends Fragment {
 
     private FragmentGoalBinding binding;
+    private UserViewModel viewModel;
+    private final FirestoreRepository repository = new FirestoreRepository();
+    private int dailyTarget = 0;
 
     private final String[] activityLevels = {
             "Sedentary", "Lightly active", "Active", "Very active"
     };
+    // TDEE multipliers, same order as activityLevels
     private final double[] activityFactors = { 1.2, 1.375, 1.55, 1.725 };
 
     private final String[] goals = { "Lose weight", "Maintain", "Build muscle" };
+    // kcal/day adjustment, same order as goals
     private final int[] goalAdjustments = { -500, 0, 300 };
-
-    private int dailyTarget = 0;
-    private UserViewModel viewModel;
-    private final FirestoreRepository repository = new FirestoreRepository();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -49,8 +54,7 @@ public class GoalFragment extends Fragment {
         binding.calculateButton.setOnClickListener(v -> calculate());
 
         binding.continueButton.setOnClickListener(v ->
-                Navigation.findNavController(view)
-                        .navigate(R.id.action_goal_to_summary));
+                Navigation.findNavController(view).navigate(R.id.action_goal_to_summary));
     }
 
     private void calculate() {
@@ -68,6 +72,7 @@ public class GoalFragment extends Fragment {
         double weight = Double.parseDouble(weightStr);
         boolean isMale = binding.sexMale.isChecked();
 
+        // Mifflin-St Jeor BMR
         double bmr = (10 * weight) + (6.25 * height) - (5 * age) + (isMale ? 5 : -161);
 
         double factor = activityFactors[binding.activitySpinner.getSelectedItemPosition()];

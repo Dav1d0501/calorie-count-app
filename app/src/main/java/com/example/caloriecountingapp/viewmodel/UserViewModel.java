@@ -1,47 +1,42 @@
 package com.example.caloriecountingapp.viewmodel;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.util.ArrayList;
-import java.util.List;
-
-// Shared data across fragments: the daily calorie target and today's logged foods.
+// Shared state across fragments: daily target and today's running totals
 public class UserViewModel extends ViewModel {
 
-    // The calculated daily calorie goal
     private final MutableLiveData<Integer> dailyTarget = new MutableLiveData<>(0);
+    private final MutableLiveData<Integer> eaten = new MutableLiveData<>(0);
+    private final MutableLiveData<Integer> protein = new MutableLiveData<>(0);
+    private final MutableLiveData<Integer> carbs = new MutableLiveData<>(0);
+    private final MutableLiveData<Integer> fat = new MutableLiveData<>(0);
 
-    // List of calories logged today (each entry = one food added)
-    private final MutableLiveData<List<Integer>> loggedCalories =
-            new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<Integer> getDailyTarget() { return dailyTarget; }
+    public void setDailyTarget(int target) { dailyTarget.setValue(target); }
 
-    public MutableLiveData<Integer> getDailyTarget() {
-        return dailyTarget;
+    public MutableLiveData<Integer> getEaten() { return eaten; }
+    public MutableLiveData<Integer> getProtein() { return protein; }
+    public MutableLiveData<Integer> getCarbs() { return carbs; }
+    public MutableLiveData<Integer> getFat() { return fat; }
+
+    // Add one logged food to today's totals
+    public void addFood(int cal, int p, int c, int f) {
+        eaten.setValue(safe(eaten) + cal);
+        protein.setValue(safe(protein) + p);
+        carbs.setValue(safe(carbs) + c);
+        fat.setValue(safe(fat) + f);
     }
 
-    public void setDailyTarget(int target) {
-        dailyTarget.setValue(target);
+    // Replace totals, used when loading a day from Firestore
+    public void setTotals(int cal, int p, int c, int f) {
+        eaten.setValue(cal);
+        protein.setValue(p);
+        carbs.setValue(c);
+        fat.setValue(f);
     }
 
-    public MutableLiveData<List<Integer>> getLoggedCalories() {
-        return loggedCalories;
-    }
-
-    // Add one food's calories to today's log
-    public void addCalories(int calories) {
-        List<Integer> current = loggedCalories.getValue();
-        if (current == null) current = new ArrayList<>();
-        current.add(calories);
-        loggedCalories.setValue(current);
-    }
-
-    // Sum of everything eaten today
-    public int getTotalEaten() {
-        int total = 0;
-        List<Integer> current = loggedCalories.getValue();
-        if (current != null) {
-            for (int c : current) total += c;
-        }
-        return total;
+    private int safe(MutableLiveData<Integer> v) {
+        return v.getValue() != null ? v.getValue() : 0;
     }
 }

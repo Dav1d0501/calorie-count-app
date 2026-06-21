@@ -10,14 +10,17 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.example.caloriecountingapp.data.FirestoreRepository;
 import com.example.caloriecountingapp.databinding.FragmentSummaryBinding;
 import com.example.caloriecountingapp.viewmodel.UserViewModel;
+import com.google.firebase.auth.FirebaseAuth;
 
-// Summary screen: shows target vs. eaten vs. remaining, reading from the shared ViewModel.
+// Shows today's totals, macros, and a 7-day overview
 public class SummaryFragment extends Fragment {
 
     private FragmentSummaryBinding binding;
     private UserViewModel viewModel;
+    private final FirestoreRepository repository = new FirestoreRepository();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -32,25 +35,46 @@ public class SummaryFragment extends Fragment {
 
         viewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
-        // Re-draw whenever the logged calories change
-        viewModel.getLoggedCalories().observe(getViewLifecycleOwner(), list -> updateUI());
-        viewModel.getDailyTarget().observe(getViewLifecycleOwner(), target -> updateUI());
+        // Load today's saved totals so the count continues across restarts
+        repository.loadDay(0, (eaten, protein, carbs, fat) ->
+                viewModel.setTotals(eaten, protein, carbs, fat));
+
+        repository.loadLastDaysTotal(7, (total, daysWithData) -> {
+            int avg = daysWithData > 0 ? total / daysWithData : 0;
+            binding.weekText.setText("Last 7 days: " + total + " kcal total  |  avg " + avg + " kcal/day");
+        });
+
+        viewModel.getDailyTarget().observe(getViewLifecycleOwner(), t -> updateUI());
+        viewModel.getEaten().observe(getViewLifecycleOwner(), e -> updateUI());
+        viewModel.getProtein().observe(getViewLifecycleOwner(), p -> updateUI());
 
         binding.addFoodButton.setOnClickListener(v ->
-                Navigation.findNavController(view)
-                        .navigate(R.id.action_summary_to_food));
+                Navigation.findNavController(view).navigate(R.id.action_summary_to_food));
+
+        binding.updateGoalButton.setOnClickListener(v ->
+                Navigation.findNavController(view).navigate(R.id.action_summary_to_goal));
+
+        binding.logoutButton.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            Navigation.findNavController(view).navigate(R.id.action_summary_to_login);
+        });
     }
 
-    // Pulls current values from the ViewModel and updates the three text views
     private void updateUI() {
-        int target = viewModel.getDailyTarget().getValue() != null
-                ? viewModel.getDailyTarget().getValue() : 0;
-        int eaten = viewModel.getTotalEaten();
+        int target = val(viewModel.getDailyTarget());
+        int eaten = val(viewModel.getEaten());
         int remaining = target - eaten;
 
         binding.targetText.setText("Target: " + target + " kcal");
         binding.eatenText.setText("Eaten: " + eaten + " kcal");
         binding.remainingText.setText("Remaining: " + remaining + " kcal");
+        binding.macrosText.setText("Protein: " + val(viewModel.getProtein()) + "g   " +
+                "Carbs: " + val(viewModel.getCarbs()) + "g   " +
+                "Fat: " + val(viewModel.getFat()) + "g");
+    }
+
+    private int val(androidx.lifecycle.LiveData<Integer> v) {
+        return v.getValue() != null ? v.getValue() : 0;
     }
 
     @Override

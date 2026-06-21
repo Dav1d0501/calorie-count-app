@@ -16,7 +16,7 @@ import com.example.caloriecountingapp.databinding.FragmentLoginBinding;
 import com.example.caloriecountingapp.viewmodel.UserViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 
-// Login screen: email/password sign-in and sign-up via Firebase Auth.
+// Email/password sign-in and sign-up via Firebase Auth
 public class LoginFragment extends Fragment {
 
     private FragmentLoginBinding binding;
@@ -38,7 +38,7 @@ public class LoginFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         viewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
-        // If already signed in from a previous session, route immediately
+        // Skip login if a session already exists
         if (auth.getCurrentUser() != null) {
             route(view);
             return;
@@ -48,7 +48,6 @@ public class LoginFragment extends Fragment {
         binding.signupButton.setOnClickListener(v -> signUp(view));
     }
 
-    // Validate the email/password inputs
     private boolean validate() {
         String email = binding.emailInput.getText().toString().trim();
         String password = binding.passwordInput.getText().toString();
@@ -91,11 +90,11 @@ public class LoginFragment extends Fragment {
                                 Toast.LENGTH_LONG).show());
     }
 
-    // Decide where to go: if the user already has a saved target, skip Goal.
+    // Existing target goes to Summary, new user goes to Goal
     private void route(View view) {
         repository.loadTarget(target -> {
             if (target > 0) {
-                viewModel.setDailyTarget(target);   // load saved target into shared state
+                viewModel.setDailyTarget(target);
                 Navigation.findNavController(view).navigate(R.id.action_login_to_summary);
             } else {
                 Navigation.findNavController(view).navigate(R.id.action_login_to_goal);

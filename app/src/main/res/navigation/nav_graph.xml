@@ -33,6 +33,12 @@
         <action
             android:id="@+id/action_summary_to_food"
             app:destination="@id/foodFragment" />
+        <action
+            android:id="@+id/action_summary_to_goal"
+            app:destination="@id/goalFragment" />
+        <action
+            android:id="@+id/action_summary_to_login"
+            app:destination="@id/loginFragment" />
     </fragment>
 
     <fragment
