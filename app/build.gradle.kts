@@ -9,6 +9,9 @@ android {
             minorApiLevel = 1
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
 
     defaultConfig {
         applicationId = "com.example.caloriecountingapp"
@@ -43,4 +46,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
 }

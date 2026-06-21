@@ -1,3 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">caloriecountingapp</string>
+    <string name="app_name">Halo</string>
+
+    <string name="welcome_title">Calories,\nmade calm.</string>
+    <string name="welcome_subtitle">Track what you eat in seconds. No guilt, no clutter — just a gentle ring that closes as your day does.</string>
+    <string name="get_started">Get started</string>
+    <string name="already_have_account">I already have an account</string>
+
+    <string name="chip_quick_log">Quick log</string>
+    <string name="chip_gentle_ring">Gentle ring</string>
+    <string name="chip_zero_guilt">Zero guilt</string>
 </resources>
