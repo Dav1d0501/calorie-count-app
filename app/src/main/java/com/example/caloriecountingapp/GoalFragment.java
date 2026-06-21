@@ -10,7 +10,7 @@ import com.example.caloriecountingapp.viewmodel.UserViewModel;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-
+import com.example.caloriecountingapp.data.FirestoreRepository;
 import com.example.caloriecountingapp.databinding.FragmentGoalBinding;
 
 public class GoalFragment extends Fragment {
@@ -27,6 +27,7 @@ public class GoalFragment extends Fragment {
 
     private int dailyTarget = 0;
     private UserViewModel viewModel;
+    private final FirestoreRepository repository = new FirestoreRepository();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -76,6 +77,7 @@ public class GoalFragment extends Fragment {
 
         binding.resultText.setText("Your daily target: " + dailyTarget + " kcal");
         viewModel.setDailyTarget(dailyTarget);
+        repository.saveTarget(dailyTarget);
         binding.continueButton.setVisibility(View.VISIBLE);
     }
 

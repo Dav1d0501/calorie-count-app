@@ -28,6 +28,8 @@ public class FoodFragment extends Fragment {
 
     private FragmentFoodBinding binding;
     private UserViewModel viewModel;
+    private final com.example.caloriecountingapp.data.FirestoreRepository repository =
+            new com.example.caloriecountingapp.data.FirestoreRepository();
     private List<Food> foods;
     private int lastCalculatedCalories = 0;
 
@@ -55,6 +57,7 @@ public class FoodFragment extends Fragment {
 
         binding.addButton.setOnClickListener(v -> {
             viewModel.addCalories(lastCalculatedCalories);
+            repository.saveTodayEaten(viewModel.getTotalEaten());  // persist today's total
             Toast.makeText(getContext(), "Added", Toast.LENGTH_SHORT).show();
             // Go back to Summary, which updates automatically
             Navigation.findNavController(view).navigateUp();

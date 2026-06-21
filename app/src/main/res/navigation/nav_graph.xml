@@ -12,6 +12,9 @@
         <action
             android:id="@+id/action_login_to_goal"
             app:destination="@id/goalFragment" />
+        <action
+            android:id="@+id/action_login_to_summary"
+            app:destination="@id/summaryFragment" />
     </fragment>
 
     <fragment
