@@ -104,7 +104,8 @@
             android:id="@+id/calculateButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/calculate_target" />
+            android:text="@string/calculate_target"
+            style="@style/HaloButton"/>
 
         <TextView
             android:id="@+id/resultText"
@@ -120,7 +121,8 @@
             android:layout_height="wrap_content"
             android:text="@string/cont"
             android:visibility="gone"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            style="@style/HaloButton"/>
 
     </LinearLayout>
 </ScrollView>

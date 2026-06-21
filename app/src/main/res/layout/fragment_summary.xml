@@ -58,7 +58,8 @@
             android:id="@+id/addFoodButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/add_food" />
+            android:text="@string/add_food"
+            style="@style/HaloButton"/>
 
         <Button
             android:id="@+id/updateGoalButton"

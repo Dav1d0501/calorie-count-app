@@ -46,7 +46,8 @@
         android:id="@+id/calculateButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/calculate" />
+        android:text="@string/calculate"
+        style="@style/HaloButton"/>
 
     <TextView
         android:id="@+id/caloriesText"
@@ -62,6 +63,7 @@
         android:layout_height="wrap_content"
         android:text="@string/add_to_today"
         android:visibility="gone"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        style="@style/HaloButton"/>
 
 </LinearLayout>
