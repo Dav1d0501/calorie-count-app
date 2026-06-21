@@ -41,7 +41,7 @@ public class SummaryFragment extends Fragment {
 
         repository.loadLastDaysTotal(7, (total, daysWithData) -> {
             int avg = daysWithData > 0 ? total / daysWithData : 0;
-            binding.weekText.setText("Last 7 days: " + total + " kcal total  |  avg " + avg + " kcal/day");
+            binding.weekText.setText(getString(R.string.week_label, total, avg));
         });
 
         viewModel.getDailyTarget().observe(getViewLifecycleOwner(), t -> updateUI());
@@ -65,12 +65,11 @@ public class SummaryFragment extends Fragment {
         int eaten = val(viewModel.getEaten());
         int remaining = target - eaten;
 
-        binding.targetText.setText("Target: " + target + " kcal");
-        binding.eatenText.setText("Eaten: " + eaten + " kcal");
-        binding.remainingText.setText("Remaining: " + remaining + " kcal");
-        binding.macrosText.setText("Protein: " + val(viewModel.getProtein()) + "g   " +
-                "Carbs: " + val(viewModel.getCarbs()) + "g   " +
-                "Fat: " + val(viewModel.getFat()) + "g");
+        binding.targetText.setText(getString(R.string.target_label, target));
+        binding.eatenText.setText(getString(R.string.eaten_label, eaten));
+        binding.remainingText.setText(getString(R.string.remaining_label, remaining));
+        binding.macrosText.setText(getString(R.string.macros_label,
+                val(viewModel.getProtein()), val(viewModel.getCarbs()), val(viewModel.getFat())));
     }
 
     private int val(androidx.lifecycle.LiveData<Integer> v) {

@@ -4,28 +4,31 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp">
+
     <Button
         android:id="@+id/backButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="← Back" />
+        android:text="@string/back" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add food"
+        android:text="@string/add_food"
         android:textSize="24sp"
         android:layout_marginBottom="24dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ingredient" />
+        android:text="@string/ingredient" />
 
     <AutoCompleteTextView
         android:id="@+id/foodSpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search ingredient..."
+        android:hint="@string/search_ingredient"
+        android:autofillHints="name"
         android:inputType="text"
         android:completionThreshold="1"
         android:layout_marginBottom="16dp" />
@@ -34,7 +37,8 @@
         android:id="@+id/gramsInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Amount (grams)"
+        android:hint="@string/amount_grams"
+        android:autofillHints="quantity"
         android:inputType="numberDecimal"
         android:layout_marginBottom="16dp" />
 
@@ -42,7 +46,7 @@
         android:id="@+id/calculateButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Calculate" />
+        android:text="@string/calculate" />
 
     <TextView
         android:id="@+id/caloriesText"
@@ -56,7 +60,7 @@
         android:id="@+id/addButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add to today"
+        android:text="@string/add_to_today"
         android:visibility="gone"
         android:layout_marginTop="16dp" />
 

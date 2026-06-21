@@ -63,7 +63,7 @@ public class GoalFragment extends Fragment {
         String weightStr = binding.weightInput.getText().toString();
 
         if (ageStr.isEmpty() || heightStr.isEmpty() || weightStr.isEmpty()) {
-            Toast.makeText(getContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -80,7 +80,7 @@ public class GoalFragment extends Fragment {
 
         dailyTarget = (int) Math.round(bmr * factor) + adjustment;
 
-        binding.resultText.setText("Your daily target: " + dailyTarget + " kcal");
+        binding.resultText.setText(getString(R.string.daily_target, dailyTarget));
         viewModel.setDailyTarget(dailyTarget);
         repository.saveTarget(dailyTarget);
         binding.continueButton.setVisibility(View.VISIBLE);

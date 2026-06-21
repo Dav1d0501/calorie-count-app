@@ -13,7 +13,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Today"
+            android:text="@string/today"
             android:textSize="28sp"
             android:layout_marginBottom="24dp" />
 
@@ -58,20 +58,20 @@
             android:id="@+id/addFoodButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Add food" />
+            android:text="@string/add_food" />
 
         <Button
             android:id="@+id/updateGoalButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Update goal"
+            android:text="@string/update_goal"
             android:layout_marginTop="12dp" />
 
         <Button
             android:id="@+id/logoutButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Logout"
+            android:text="@string/logout"
             android:layout_marginTop="12dp" />
 
     </LinearLayout>

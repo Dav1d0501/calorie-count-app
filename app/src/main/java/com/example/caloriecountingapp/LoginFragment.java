@@ -38,7 +38,6 @@ public class LoginFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         viewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
-        // Skip login if a session already exists
         if (auth.getCurrentUser() != null) {
             route(view);
             return;
@@ -52,12 +51,11 @@ public class LoginFragment extends Fragment {
         String email = binding.emailInput.getText().toString().trim();
         String password = binding.passwordInput.getText().toString();
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(getContext(), "Enter email and password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.enter_email_password), Toast.LENGTH_SHORT).show();
             return false;
         }
         if (password.length() < 6) {
-            Toast.makeText(getContext(), "Password must be at least 6 characters",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.password_too_short), Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -71,7 +69,7 @@ public class LoginFragment extends Fragment {
         auth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener(result -> route(view))
                 .addOnFailureListener(e ->
-                        Toast.makeText(getContext(), "Sign in failed: " + e.getMessage(),
+                        Toast.makeText(getContext(), getString(R.string.sign_in_failed, e.getMessage()),
                                 Toast.LENGTH_LONG).show());
     }
 
@@ -82,15 +80,14 @@ public class LoginFragment extends Fragment {
 
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener(result -> {
-                    Toast.makeText(getContext(), "Account created", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.account_created), Toast.LENGTH_SHORT).show();
                     route(view);
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(getContext(), "Sign up failed: " + e.getMessage(),
+                        Toast.makeText(getContext(), getString(R.string.sign_up_failed, e.getMessage()),
                                 Toast.LENGTH_LONG).show());
     }
 
-    // Existing target goes to Summary, new user goes to Goal
     private void route(View view) {
         repository.loadTarget(target -> {
             if (target > 0) {

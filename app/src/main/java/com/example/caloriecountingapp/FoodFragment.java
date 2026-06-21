@@ -64,7 +64,7 @@ public class FoodFragment extends Fragment {
                     viewModel.getProtein().getValue(),
                     viewModel.getCarbs().getValue(),
                     viewModel.getFat().getValue());
-            Toast.makeText(getContext(), "Added", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.added), Toast.LENGTH_SHORT).show();
             Navigation.findNavController(view).navigateUp();
         });
     }
@@ -88,11 +88,11 @@ public class FoodFragment extends Fragment {
         String typedName = binding.foodSpinner.getText().toString().trim();
 
         if (typedName.isEmpty()) {
-            Toast.makeText(getContext(), "Pick an ingredient", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.pick_ingredient), Toast.LENGTH_SHORT).show();
             return;
         }
         if (gramsStr.isEmpty()) {
-            Toast.makeText(getContext(), "Enter grams", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.enter_grams), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -105,7 +105,7 @@ public class FoodFragment extends Fragment {
             }
         }
         if (selected == null) {
-            Toast.makeText(getContext(), "Ingredient not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.ingredient_not_found), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -115,9 +115,8 @@ public class FoodFragment extends Fragment {
         lastCarbs = selected.carbsForGrams(grams);
         lastFat = selected.fatForGrams(grams);
 
-        binding.caloriesText.setText(
-                selected.name + " (" + (int) grams + "g) = " + lastCal + " kcal\n" +
-                        "P: " + lastProtein + "g  C: " + lastCarbs + "g  F: " + lastFat + "g");
+        binding.caloriesText.setText(getString(R.string.food_result,
+                selected.name, (int) grams, lastCal, lastProtein, lastCarbs, lastFat));
         binding.addButton.setVisibility(View.VISIBLE);
     }
 

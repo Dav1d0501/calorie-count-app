@@ -12,14 +12,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tell us about you"
+            android:text="@string/about_you"
             android:textSize="24sp"
             android:layout_marginBottom="24dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sex" />
+            android:text="@string/sex" />
 
         <RadioGroup
             android:id="@+id/sexGroup"
@@ -32,21 +32,22 @@
                 android:id="@+id/sexMale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Male"
+                android:text="@string/male"
                 android:checked="true" />
 
             <RadioButton
                 android:id="@+id/sexFemale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Female" />
+                android:text="@string/female" />
         </RadioGroup>
 
         <EditText
             android:id="@+id/ageInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Age (years)"
+            android:hint="@string/age_hint"
+            android:autofillHints="age"
             android:inputType="number"
             android:layout_marginBottom="12dp" />
 
@@ -54,7 +55,8 @@
             android:id="@+id/heightInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Height (cm)"
+            android:hint="@string/height_hint"
+            android:autofillHints="height"
             android:inputType="number"
             android:layout_marginBottom="12dp" />
 
@@ -62,14 +64,15 @@
             android:id="@+id/weightInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Weight (kg)"
+            android:hint="@string/weight_hint"
+            android:autofillHints="weight"
             android:inputType="numberDecimal"
             android:layout_marginBottom="16dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Activity level" />
+            android:text="@string/activity_level" />
 
         <Spinner
             android:id="@+id/activitySpinner"
@@ -80,7 +83,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Goal" />
+            android:text="@string/goal" />
 
         <Spinner
             android:id="@+id/goalSpinner"
@@ -92,7 +95,7 @@
             android:id="@+id/calculateButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Calculate my target" />
+            android:text="@string/calculate_target" />
 
         <TextView
             android:id="@+id/resultText"
@@ -106,7 +109,7 @@
             android:id="@+id/continueButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Continue"
+            android:text="@string/cont"
             android:visibility="gone"
             android:layout_marginTop="16dp" />
 

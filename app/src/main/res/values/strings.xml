@@ -2,12 +2,53 @@
 <resources>
     <string name="app_name">Halo</string>
 
-    <string name="welcome_title">Calories,\nmade calm.</string>
-    <string name="welcome_subtitle">Track what you eat in seconds. No guilt, no clutter — just a gentle ring that closes as your day does.</string>
-    <string name="get_started">Get started</string>
-    <string name="already_have_account">I already have an account</string>
+    <!-- Login -->
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="enter_email_password">Enter email and password</string>
+    <string name="password_too_short">Password must be at least 6 characters</string>
+    <string name="account_created">Account created</string>
+    <string name="sign_in_failed">Sign in failed: %1$s</string>
+    <string name="sign_up_failed">Sign up failed: %1$s</string>
 
-    <string name="chip_quick_log">Quick log</string>
-    <string name="chip_gentle_ring">Gentle ring</string>
-    <string name="chip_zero_guilt">Zero guilt</string>
+    <!-- Goal -->
+    <string name="about_you">Tell us about you</string>
+    <string name="sex">Sex</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="age_hint">Age (years)</string>
+    <string name="height_hint">Height (cm)</string>
+    <string name="weight_hint">Weight (kg)</string>
+    <string name="activity_level">Activity level</string>
+    <string name="goal">Goal</string>
+    <string name="calculate_target">Calculate my target</string>
+    <string name="fill_all_fields">Please fill all fields</string>
+    <string name="daily_target">Your daily target: %1$d kcal</string>
+    <string name="cont">Continue</string>
+
+    <!-- Food -->
+    <string name="add_food">Add food</string>
+    <string name="back">← Back</string>
+    <string name="ingredient">Ingredient</string>
+    <string name="search_ingredient">Search ingredient...</string>
+    <string name="amount_grams">Amount (grams)</string>
+    <string name="calculate">Calculate</string>
+    <string name="add_to_today">Add to today</string>
+    <string name="pick_ingredient">Pick an ingredient</string>
+    <string name="enter_grams">Enter grams</string>
+    <string name="ingredient_not_found">Ingredient not found</string>
+    <string name="added">Added</string>
+    <string name="food_result">%1$s (%2$dg) = %3$d kcal\nP: %4$dg  C: %5$dg  F: %6$dg</string>
+
+    <!-- Summary -->
+    <string name="today">Today</string>
+    <string name="target_label">Target: %1$d kcal</string>
+    <string name="eaten_label">Eaten: %1$d kcal</string>
+    <string name="remaining_label">Remaining: %1$d kcal</string>
+    <string name="macros_label">Protein: %1$dg   Carbs: %2$dg   Fat: %3$dg</string>
+    <string name="week_label">Last 7 days: %1$d kcal total  |  avg %2$d kcal/day</string>
+    <string name="update_goal">Update goal</string>
+    <string name="logout">Logout</string>
 </resources>
