@@ -10,6 +10,8 @@ constraintlayout = "2.2.1"
 navigation = "2.9.8"
 lifecycle = "2.11.0"
 gson = "2.11.0"
+googleGmsGoogleServices = "4.5.0"
+firebaseAuth = "24.1.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -24,7 +26,9 @@ navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version
 lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycle" }
 lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata", version.ref = "lifecycle" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 
