@@ -6,7 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
-
+import androidx.lifecycle.ViewModelProvider;
+import com.example.caloriecountingapp.viewmodel.UserViewModel;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -26,6 +27,7 @@ public class GoalFragment extends Fragment {
     private final int[] goalAdjustments = { -500, 0, 300 };
 
     private int dailyTarget = 0;
+    private UserViewModel viewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -37,6 +39,7 @@ public class GoalFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        viewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
         binding.activitySpinner.setAdapter(new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_dropdown_item, activityLevels));
@@ -73,6 +76,7 @@ public class GoalFragment extends Fragment {
         dailyTarget = (int) Math.round(bmr * factor) + adjustment;
 
         binding.resultText.setText("Your daily target: " + dailyTarget + " kcal");
+        viewModel.setDailyTarget(dailyTarget);
         binding.continueButton.setVisibility(View.VISIBLE);
     }
 
