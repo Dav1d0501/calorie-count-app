@@ -74,9 +74,14 @@ public class SummaryFragment extends Fragment {
         binding.remainingText.setText(getString(R.string.remaining_label, remaining));
         binding.targetText.setText(getString(R.string.target_label, target));
         binding.eatenText.setText(getString(R.string.eaten_label, eaten));
-        binding.macrosText.setText(getString(R.string.macros_label,
-                viewModel.getTotalProtein(), viewModel.getTotalCarbs(), viewModel.getTotalFat()));
-
+        // Target macros from the calorie goal: 30% protein, 40% carbs, 30% fat
+        int targetProtein = (int) Math.round(target * 0.30 / 4);
+        int targetCarbs = (int) Math.round(target * 0.40 / 4);
+        int targetFat = (int) Math.round(target * 0.30 / 9);
+        binding.macrosText.setText(getString(R.string.macros_goal_label,
+                viewModel.getTotalProtein(), targetProtein,
+                viewModel.getTotalCarbs(), targetCarbs,
+                viewModel.getTotalFat(), targetFat));
         // Progress bar: percent of target eaten (capped at 100)
         int percent = target > 0 ? Math.min(100, eaten * 100 / target) : 0;
         binding.progressBar.setProgress(percent);
