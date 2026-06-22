@@ -11,11 +11,14 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.caloriecountingapp.data.FirestoreRepository;
+import com.example.caloriecountingapp.data.Meal;
 import com.example.caloriecountingapp.databinding.FragmentSummaryBinding;
 import com.example.caloriecountingapp.viewmodel.UserViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 
-// Shows today's totals, macros, and a 7-day overview
+import java.util.List;
+
+// Main screen: progress, macros, 7-day overview, and today's meal list
 public class SummaryFragment extends Fragment {
 
     private FragmentSummaryBinding binding;
@@ -35,9 +38,8 @@ public class SummaryFragment extends Fragment {
 
         viewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
 
-        // Load today's saved totals so the count continues across restarts
-        repository.loadDay(0, (eaten, protein, carbs, fat) ->
-                viewModel.setTotals(eaten, protein, carbs, fat));
+        // Load today's meals so the list and totals persist across restarts
+        repository.loadTodayMeals(meals -> viewModel.setMeals(meals));
 
         repository.loadLastDaysTotal(7, (total, daysWithData) -> {
             int avg = daysWithData > 0 ? total / daysWithData : 0;
@@ -45,14 +47,18 @@ public class SummaryFragment extends Fragment {
         });
 
         viewModel.getDailyTarget().observe(getViewLifecycleOwner(), t -> updateUI());
-        viewModel.getEaten().observe(getViewLifecycleOwner(), e -> updateUI());
-        viewModel.getProtein().observe(getViewLifecycleOwner(), p -> updateUI());
+        viewModel.getMeals().observe(getViewLifecycleOwner(), m -> updateUI());
 
         binding.addFoodButton.setOnClickListener(v ->
                 Navigation.findNavController(view).navigate(R.id.action_summary_to_food));
 
         binding.updateGoalButton.setOnClickListener(v ->
                 Navigation.findNavController(view).navigate(R.id.action_summary_to_goal));
+
+        binding.resetButton.setOnClickListener(v -> {
+            viewModel.clearMeals();
+            repository.saveMeals(viewModel.getMeals().getValue());
+        });
 
         binding.logoutButton.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
@@ -62,14 +68,32 @@ public class SummaryFragment extends Fragment {
 
     private void updateUI() {
         int target = val(viewModel.getDailyTarget());
-        int eaten = val(viewModel.getEaten());
+        int eaten = viewModel.getTotalCal();
         int remaining = target - eaten;
 
+        binding.remainingText.setText(getString(R.string.remaining_label, remaining));
         binding.targetText.setText(getString(R.string.target_label, target));
         binding.eatenText.setText(getString(R.string.eaten_label, eaten));
-        binding.remainingText.setText(getString(R.string.remaining_label, remaining));
         binding.macrosText.setText(getString(R.string.macros_label,
-                val(viewModel.getProtein()), val(viewModel.getCarbs()), val(viewModel.getFat())));
+                viewModel.getTotalProtein(), viewModel.getTotalCarbs(), viewModel.getTotalFat()));
+
+        // Progress bar: percent of target eaten (capped at 100)
+        int percent = target > 0 ? Math.min(100, eaten * 100 / target) : 0;
+        binding.progressBar.setProgress(percent);
+
+        // Build the meal list text
+        List<Meal> meals = viewModel.getMeals().getValue();
+        if (meals == null || meals.isEmpty()) {
+            binding.mealsText.setText(getString(R.string.no_meals));
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < meals.size(); i++) {
+                Meal m = meals.get(i);
+                sb.append(getString(R.string.meal_row, m.name, m.grams, m.cal));
+                if (i < meals.size() - 1) sb.append("\n");
+            }
+            binding.mealsText.setText(sb.toString());
+        }
     }
 
     private int val(androidx.lifecycle.LiveData<Integer> v) {

@@ -14,6 +14,7 @@ import androidx.navigation.Navigation;
 
 import com.example.caloriecountingapp.data.Food;
 import com.example.caloriecountingapp.data.FirestoreRepository;
+import com.example.caloriecountingapp.data.Meal;
 import com.example.caloriecountingapp.databinding.FragmentFoodBinding;
 import com.example.caloriecountingapp.viewmodel.UserViewModel;
 import com.google.gson.Gson;
@@ -23,7 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-// Loads the ingredient catalog, computes calories + macros for an amount, logs it
+// Loads the catalog, computes a meal for an amount, logs it
 public class FoodFragment extends Fragment {
 
     private FragmentFoodBinding binding;
@@ -31,8 +32,8 @@ public class FoodFragment extends Fragment {
     private final FirestoreRepository repository = new FirestoreRepository();
     private List<Food> foods;
 
-    // Last calculated values, committed when the user taps Add
-    private int lastCal = 0, lastProtein = 0, lastCarbs = 0, lastFat = 0;
+    // The meal built by the last Calculate, committed on Add
+    private Meal pendingMeal;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -58,12 +59,9 @@ public class FoodFragment extends Fragment {
         binding.calculateButton.setOnClickListener(v -> calculate());
 
         binding.addButton.setOnClickListener(v -> {
-            viewModel.addFood(lastCal, lastProtein, lastCarbs, lastFat);
-            repository.saveToday(
-                    viewModel.getEaten().getValue(),
-                    viewModel.getProtein().getValue(),
-                    viewModel.getCarbs().getValue(),
-                    viewModel.getFat().getValue());
+            if (pendingMeal == null) return;
+            viewModel.addMeal(pendingMeal);
+            repository.saveMeals(viewModel.getMeals().getValue());
             Toast.makeText(getContext(), getString(R.string.added), Toast.LENGTH_SHORT).show();
             Navigation.findNavController(view).navigateUp();
         });
@@ -96,7 +94,6 @@ public class FoodFragment extends Fragment {
             return;
         }
 
-        // Match the typed text to a food in the catalog
         Food selected = null;
         for (Food f : foods) {
             if (f.name.equalsIgnoreCase(typedName)) {
@@ -109,18 +106,21 @@ public class FoodFragment extends Fragment {
             return;
         }
 
-        double grams = Double.parseDouble(gramsStr);
-        lastCal = selected.caloriesForGrams(grams);
-        lastProtein = selected.proteinForGrams(grams);
-        lastCarbs = selected.carbsForGrams(grams);
-        lastFat = selected.fatForGrams(grams);
+        int grams = (int) Double.parseDouble(gramsStr);
+        pendingMeal = new Meal(
+                selected.name,
+                grams,
+                selected.caloriesForGrams(grams),
+                selected.proteinForGrams(grams),
+                selected.carbsForGrams(grams),
+                selected.fatForGrams(grams));
 
         binding.caloriesText.setText(getString(R.string.food_result,
-                selected.name, (int) grams, lastCal, lastProtein, lastCarbs, lastFat));
+                pendingMeal.name, pendingMeal.grams, pendingMeal.cal,
+                pendingMeal.protein, pendingMeal.carbs, pendingMeal.fat));
         binding.addButton.setVisibility(View.VISIBLE);
     }
 
-    // Top-level shape of foods.json
     private static class FoodWrapper {
         List<Food> foods;
     }

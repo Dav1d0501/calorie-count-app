@@ -3,40 +3,59 @@ package com.example.caloriecountingapp.viewmodel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-// Shared state across fragments: daily target and today's running totals
+import com.example.caloriecountingapp.data.Meal;
+
+import java.util.ArrayList;
+import java.util.List;
+
+// Shared state: daily target and today's logged meals
 public class UserViewModel extends ViewModel {
 
     private final MutableLiveData<Integer> dailyTarget = new MutableLiveData<>(0);
-    private final MutableLiveData<Integer> eaten = new MutableLiveData<>(0);
-    private final MutableLiveData<Integer> protein = new MutableLiveData<>(0);
-    private final MutableLiveData<Integer> carbs = new MutableLiveData<>(0);
-    private final MutableLiveData<Integer> fat = new MutableLiveData<>(0);
+    private final MutableLiveData<List<Meal>> meals = new MutableLiveData<>(new ArrayList<>());
 
     public MutableLiveData<Integer> getDailyTarget() { return dailyTarget; }
     public void setDailyTarget(int target) { dailyTarget.setValue(target); }
 
-    public MutableLiveData<Integer> getEaten() { return eaten; }
-    public MutableLiveData<Integer> getProtein() { return protein; }
-    public MutableLiveData<Integer> getCarbs() { return carbs; }
-    public MutableLiveData<Integer> getFat() { return fat; }
+    public MutableLiveData<List<Meal>> getMeals() { return meals; }
 
-    // Add one logged food to today's totals
-    public void addFood(int cal, int p, int c, int f) {
-        eaten.setValue(safe(eaten) + cal);
-        protein.setValue(safe(protein) + p);
-        carbs.setValue(safe(carbs) + c);
-        fat.setValue(safe(fat) + f);
+    // Add one meal to today's list
+    public void addMeal(Meal meal) {
+        List<Meal> current = meals.getValue();
+        if (current == null) current = new ArrayList<>();
+        current.add(meal);
+        meals.setValue(current);
     }
 
-    // Replace totals, used when loading a day from Firestore
-    public void setTotals(int cal, int p, int c, int f) {
-        eaten.setValue(cal);
-        protein.setValue(p);
-        carbs.setValue(c);
-        fat.setValue(f);
+    // Replace the whole list, used when loading from Firestore
+    public void setMeals(List<Meal> list) {
+        meals.setValue(list != null ? list : new ArrayList<>());
     }
 
-    private int safe(MutableLiveData<Integer> v) {
-        return v.getValue() != null ? v.getValue() : 0;
+    // Clear today's meals
+    public void clearMeals() {
+        meals.setValue(new ArrayList<>());
+    }
+
+    // Computed totals
+    public int getTotalCal() { return sum(0); }
+    public int getTotalProtein() { return sum(1); }
+    public int getTotalCarbs() { return sum(2); }
+    public int getTotalFat() { return sum(3); }
+
+    private int sum(int which) {
+        int total = 0;
+        List<Meal> current = meals.getValue();
+        if (current != null) {
+            for (Meal m : current) {
+                switch (which) {
+                    case 0: total += m.cal; break;
+                    case 1: total += m.protein; break;
+                    case 2: total += m.carbs; break;
+                    case 3: total += m.fat; break;
+                }
+            }
+        }
+        return total;
     }
 }

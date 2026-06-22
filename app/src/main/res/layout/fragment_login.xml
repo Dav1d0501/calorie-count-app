@@ -4,14 +4,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="24dp">
+    android:background="@color/bg"
+    android:padding="28dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/login"
-        android:textSize="28sp"
-        android:layout_marginBottom="32dp" />
+        android:text="@string/login_subtitle"
+        android:textColor="@color/text_secondary"
+        android:textSize="15sp"
+        android:layout_marginBottom="40dp" />
 
     <EditText
         android:id="@+id/emailInput"
@@ -31,21 +33,23 @@
         android:hint="@string/password_hint"
         android:autofillHints="password"
         android:inputType="textPassword"
-        android:layout_marginBottom="24dp" />
+        android:layout_marginBottom="28dp" />
 
     <Button
         android:id="@+id/loginButton"
+        style="@style/HaloButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/login"
-        android:layout_marginBottom="8dp"
-        style="@style/HaloButton"/>
+        android:layout_marginBottom="12dp" />
 
     <Button
         android:id="@+id/signupButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/sign_up"
-        style="@style/HaloButton"/>
+        android:textColor="@color/text_secondary"
+        android:background="@android:color/transparent"
+        android:textAllCaps="false" />
 
 </LinearLayout>

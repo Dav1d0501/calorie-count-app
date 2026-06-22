@@ -6,8 +6,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -25,12 +27,14 @@ public class FirestoreRepository {
         return dayKey(0);
     }
 
-    // Date key N days back, e.g. "2026-06-21"
+    // Date key N days back, e.g. "2026-06-22"
     public static String dayKey(int daysAgo) {
         Calendar c = Calendar.getInstance();
         c.add(Calendar.DAY_OF_YEAR, -daysAgo);
         return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(c.getTime());
     }
+
+    //  Target
 
     public void saveTarget(int target) {
         if (uid() == null) return;
@@ -58,42 +62,41 @@ public class FirestoreRepository {
                 .addOnFailureListener(e -> callback.onResult(0));
     }
 
-    public void saveToday(int eaten, int protein, int carbs, int fat) {
+    //  Daily meals
+
+    // Save the full meals list for today
+    public void saveMeals(List<Meal> meals) {
         if (uid() == null) return;
         Map<String, Object> data = new HashMap<>();
-        data.put("eaten", eaten);
-        data.put("protein", protein);
-        data.put("carbs", carbs);
-        data.put("fat", fat);
+        data.put("meals", meals);
         db.collection("users").document(uid())
                 .collection("days").document(today())
                 .set(data);
     }
 
-    public interface DayCallback { void onResult(int eaten, int protein, int carbs, int fat); }
+    public interface MealsCallback { void onResult(List<Meal> meals); }
 
-    public void loadDay(int daysAgo, @NonNull DayCallback callback) {
-        if (uid() == null) { callback.onResult(0, 0, 0, 0); return; }
+    // Load today's meals list
+    public void loadTodayMeals(@NonNull MealsCallback callback) {
+        if (uid() == null) { callback.onResult(new ArrayList<>()); return; }
         db.collection("users").document(uid())
-                .collection("days").document(dayKey(daysAgo))
+                .collection("days").document(today())
                 .get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
-                        callback.onResult(
-                                intOf(doc.getLong("eaten")),
-                                intOf(doc.getLong("protein")),
-                                intOf(doc.getLong("carbs")),
-                                intOf(doc.getLong("fat")));
+                        List<Meal> meals = doc.toObject(DayDoc.class) != null
+                                ? doc.toObject(DayDoc.class).meals : null;
+                        callback.onResult(meals != null ? meals : new ArrayList<>());
                     } else {
-                        callback.onResult(0, 0, 0, 0);
+                        callback.onResult(new ArrayList<>());
                     }
                 })
-                .addOnFailureListener(e -> callback.onResult(0, 0, 0, 0));
+                .addOnFailureListener(e -> callback.onResult(new ArrayList<>()));
     }
 
+    // Sum of calories across the last numDays days
     public interface WeekCallback { void onResult(int total, int daysWithData); }
 
-    // Sums "eaten" over the last numDays days; fires callback once all reads return
     public void loadLastDaysTotal(int numDays, @NonNull WeekCallback callback) {
         if (uid() == null) { callback.onResult(0, 0); return; }
         final int[] total = {0};
@@ -106,10 +109,14 @@ public class FirestoreRepository {
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful() && task.getResult() != null
-                                && task.getResult().exists()
-                                && task.getResult().getLong("eaten") != null) {
-                            total[0] += task.getResult().getLong("eaten").intValue();
-                            withData[0]++;
+                                && task.getResult().exists()) {
+                            DayDoc d = task.getResult().toObject(DayDoc.class);
+                            if (d != null && d.meals != null && !d.meals.isEmpty()) {
+                                int dayCal = 0;
+                                for (Meal m : d.meals) dayCal += m.cal;
+                                total[0] += dayCal;
+                                withData[0]++;
+                            }
                         }
                         remaining[0]--;
                         if (remaining[0] == 0) {
@@ -119,5 +126,9 @@ public class FirestoreRepository {
         }
     }
 
-    private int intOf(Long v) { return v != null ? v.intValue() : 0; }
+    // Maps the day document shape for Firestore deserialization
+    public static class DayDoc {
+        public List<Meal> meals;
+        public DayDoc() { }
+    }
 }
