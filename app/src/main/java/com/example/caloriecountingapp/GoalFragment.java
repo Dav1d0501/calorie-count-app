@@ -78,6 +78,24 @@ public class GoalFragment extends Fragment {
         double targetWeight = Double.parseDouble(targetWeightStr);
         boolean isMale = binding.sexMale.isChecked();
 
+        // Range checks with specific messages
+        if (age < 10 || age > 100) {
+            Toast.makeText(getContext(), getString(R.string.invalid_age), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (height < 100 || height > 250) {
+            Toast.makeText(getContext(), getString(R.string.invalid_height), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (weight < 30 || weight > 300) {
+            Toast.makeText(getContext(), getString(R.string.invalid_weight), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (targetWeight < 30 || targetWeight > 300) {
+            Toast.makeText(getContext(), getString(R.string.invalid_target_weight), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Mifflin-St Jeor BMR, then maintenance calories
         double bmr = (10 * weight) + (6.25 * height) - (5 * age) + (isMale ? 5 : -161);
         double maintenance = bmr * activityFactors[binding.activitySpinner.getSelectedItemPosition()];

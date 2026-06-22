@@ -59,5 +59,8 @@
     <string name="no_meals">No food logged yet today</string>
     <string name="reset_today">Reset today</string>
     <string name="macros_goal_label">Protein: %1$d/%2$dg   Carbs: %3$d/%4$dg   Fat: %5$d/%6$dg</string>
-
+    <string name="invalid_age">Enter a valid age (10–100)</string>
+    <string name="invalid_height">Enter a valid height (100–250 cm)</string>
+    <string name="invalid_weight">Enter a valid weight (30–300 kg)</string>
+    <string name="invalid_target_weight">Enter a valid target weight (30–300 kg)</string>
 </resources>

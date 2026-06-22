@@ -107,7 +107,10 @@ public class FoodFragment extends Fragment {
         }
 
         int grams = (int) Double.parseDouble(gramsStr);
-        pendingMeal = new Meal(
+        if (grams <= 0) {
+            Toast.makeText(getContext(), getString(R.string.enter_grams), Toast.LENGTH_SHORT).show();
+            return;
+        }        pendingMeal = new Meal(
                 selected.name,
                 grams,
                 selected.caloriesForGrams(grams),
